@@ -1,0 +1,4 @@
+name: PluginFramework
+version: '${project.version}'
+main: mine.plugins.lunar.plugin_framework.Main
+api-version: 1.19
