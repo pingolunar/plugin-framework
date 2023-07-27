@@ -8,6 +8,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItemBuilder {
     private final ItemStack item;
@@ -17,7 +19,7 @@ public class ItemBuilder {
 
     @Getter private ItemFlag[] flags = new ItemFlag[0];
     @Getter private String[] lore = new String[0];
-    @Getter private Enchantment[] enchantments = new Enchantment[0];
+    @Getter private Map<Enchantment, Integer> enchantments = new HashMap<>();
 
     public ItemBuilder(ItemStack item) {
         this.item = item;
@@ -92,7 +94,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder setEnchantments(Enchantment... enchantments) {
+    public ItemBuilder setEnchantments(Map<Enchantment, Integer> enchantments) {
         this.enchantments = enchantments;
         return this;
     }
@@ -128,8 +130,8 @@ public class ItemBuilder {
         meta.addItemFlags(flags);
         meta.setUnbreakable(isUnbreakable);
 
-        for (var enchantment : enchantments)
-            meta.addEnchant(enchantment, 1, true);
+        for (var enchantment : enchantments.entrySet())
+            meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
 
         modified.setItemMeta(meta);
     }
