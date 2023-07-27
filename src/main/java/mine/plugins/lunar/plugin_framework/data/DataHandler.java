@@ -174,7 +174,8 @@ public record DataHandler(JavaPlugin plugin) {
 	}
 
 	@Nullable
-	public File createPath(Path path) {
+	public File createPath(@NonNull Path path) {
+
 		try {
 			var dir = new File(getPluginDataFolder().resolve(path).toString());
 			if (dir.exists())

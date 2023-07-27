@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 public class PlayerDeathListener implements Listener {
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onPlayerDamageTaken(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player player))
             return;
@@ -31,8 +31,6 @@ public class PlayerDeathListener implements Listener {
 
         var playerDeathEvent = new PlayerDeathEvent(e, null, player);
         Bukkit.getPluginManager().callEvent(playerDeathEvent);
-
-        if (playerDeathEvent.isCancelled())
-            e.setCancelled(true);
+        e.setCancelled(playerDeathEvent.isCancelled());
     }
 }
