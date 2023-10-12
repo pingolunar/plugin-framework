@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -94,10 +95,17 @@ public class ItemBuilder {
         return this;
     }
 
+    //region Enchantments
     public ItemBuilder setEnchantments(Map<Enchantment, Integer> enchantments) {
         this.enchantments = enchantments;
         return this;
     }
+
+    public static Map<Enchantment, Integer> getEnchantments(ItemStack item) {
+        return item.getItemMeta() instanceof EnchantmentStorageMeta enchantBookMeta ?
+                enchantBookMeta.getStoredEnchants() : item.getEnchantments();
+    }
+    //endregion
 
     /**
      * Returns an ItemStack with the settings
@@ -130,8 +138,12 @@ public class ItemBuilder {
         meta.addItemFlags(flags);
         meta.setUnbreakable(isUnbreakable);
 
-        for (var enchantment : enchantments.entrySet())
-            meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
+        for (var enchantment : enchantments.entrySet()) {
+            if (meta instanceof EnchantmentStorageMeta enchantBookMeta)
+                enchantBookMeta.addStoredEnchant(enchantment.getKey(), enchantment.getValue(), true);
+            else
+                meta.addEnchant(enchantment.getKey(), enchantment.getValue(), true);
+        }
 
         modified.setItemMeta(meta);
     }

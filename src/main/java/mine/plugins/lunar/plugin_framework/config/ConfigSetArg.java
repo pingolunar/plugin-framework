@@ -5,21 +5,17 @@ import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class ConfigArg extends Arg {
+public class ConfigSetArg extends Arg {
 
+    private final Object configObj;
     private final Map<String, Field> fields;
-    private final Object skillConfig;
 
-    public ConfigArg(Object skillConfig, String permission) {
+    public ConfigSetArg(Object configObj, Map<String, Field> fields, String permission) {
         super("set", new String[] {"Missing field name", "Missing field value"}, permission);
 
-        this.skillConfig = skillConfig;
-        fields = Stream.of(skillConfig.getClass().getDeclaredFields())
-                .collect(Collectors.toMap(Field::getName, Function.identity()));
+        this.configObj = configObj;
+        this.fields = fields;
     }
 
     @Override
@@ -49,6 +45,13 @@ public class ConfigArg extends Arg {
                     yield null;
                 }
 
+            case "class [Ljava.lang.Integer;":
+                try {
+                    yield Arrays.stream(args.getLast().split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                } catch (NumberFormatException ignored) {
+                    yield null;
+                }
+
             default:
                 yield null;
         };
@@ -59,7 +62,7 @@ public class ConfigArg extends Arg {
         }
 
         try {
-            fieldSelected.set(skillConfig, value);
+            fieldSelected.set(configObj, value);
             sender.sendMessage("Field '"+fieldSelected.getName()+"' set to: "+value);
 
         } catch (IllegalAccessException | IllegalArgumentException exception) {

@@ -11,7 +11,11 @@ import java.util.stream.Collectors;
 
 public abstract class LinkArg extends Arg {
 
-	private final Map<String, Arg> cmdArgs ;
+	private final Map<String, Arg> cmdArgs = new HashMap<>();
+
+	protected void addCmdArgs(List<Arg> args) {
+		cmdArgs.putAll(args.stream().collect(Collectors.toMap(Arg::getName, Function.identity())));
+	}
 
 	protected LinkArg(String name, @NonNull List<Arg> args) {
 		this(name, args, null);
@@ -19,9 +23,13 @@ public abstract class LinkArg extends Arg {
 
 	protected LinkArg(String name, @NonNull List<Arg> args, @Nullable String permission) {
 		super(name, null, permission);
-		cmdArgs = args.stream().collect(Collectors.toMap(Arg::getName, Function.identity()));
+		addCmdArgs(args);
 	}
-	
+
+	protected LinkArg(String name, @Nullable String permission) {
+		super(name, null, permission);
+	}
+
 	@Override
 	protected void execute(CommandSender sender, String base, LinkedList<String> args) {
 

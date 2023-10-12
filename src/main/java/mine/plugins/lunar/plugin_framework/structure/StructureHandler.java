@@ -3,12 +3,14 @@ package mine.plugins.lunar.plugin_framework.structure;
 import com.github.shynixn.structureblocklib.api.bukkit.StructureBlockLibApi;
 import com.github.shynixn.structureblocklib.api.enumeration.StructureRestriction;
 import com.github.shynixn.structureblocklib.api.enumeration.StructureRotation;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import mine.plugins.lunar.plugin_framework.data.DataHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3i;
 
 import java.nio.file.Path;
@@ -24,20 +26,17 @@ public class StructureHandler {
     private final JavaPlugin plugin;
     private final DataHandler dataHandler;
 
-    @NonNull @Setter private String name = "default";
-    @NonNull @Setter private Vector3i size = new Vector3i(16, 16, 16);
-    @NonNull @Setter private StructureRotation rotation = StructureRotation.NONE;
+    @Getter private Path structurePath;
+    @NonNull @Setter @Getter private String name = "default";
+    @NonNull @Setter @Getter private Vector3i size = new Vector3i(16, 16, 16);
+    @NonNull @Setter @Getter private StructureRotation rotation = StructureRotation.NONE;
+    @NonNull @Setter @Getter private Location location;
 
-    private Path structurePath;
-    @NonNull @Setter private Location location;
-
-    public StructureHandler(JavaPlugin plugin, World world) {
+    public StructureHandler(JavaPlugin plugin) {
         this.plugin = plugin;
         this.dataHandler = new DataHandler(plugin);
 
         setStructurePath(Paths.get(""));
-        this.location = new Location(world, 0, 0, 0);
-
         dataHandler.createPath(structurePath);
     }
 
