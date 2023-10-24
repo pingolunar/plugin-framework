@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -52,6 +53,32 @@ public class ParticleTask extends TaskHandler {
 
     public void start(Player player, @NonNull Particle.DustOptions dust) {
         super.start(getStart(player, dust));
+    }
+
+    public void start(World world, @NonNull Particle.DustOptions dust) {
+        super.start(getStart(world, dust));
+    }
+
+    public void start(World world, @NonNull Particle.DustOptions dust, @NonNull Callable<List<Location>> callable) {
+        super.start(getStart(world, dust, callable));
+    }
+
+    private Callable<Boolean> getStart(World world, @NonNull Particle.DustOptions dust) {
+        return getStart(world, dust, () -> locations);
+    }
+
+    private Callable<Boolean> getStart(World world, @NonNull Particle.DustOptions dust,
+                                       @NonNull Callable<List<Location>> callable) {
+        return () -> {
+            for (var location : callable.call()) {
+                world.spawnParticle(Particle.REDSTONE, location, 1, dust);
+
+                for (var velocity : velocities.values())
+                    location.add(velocity);
+            }
+
+            return true;
+        };
     }
 
     private Callable<Boolean> getStart(Player player, @NonNull Particle.DustOptions dust) {

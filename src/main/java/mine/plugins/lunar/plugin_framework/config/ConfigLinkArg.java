@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class ConfigLinkArg extends LinkArg {
 
     public ConfigLinkArg(Object configObj, String permission) {
-        super("config", permission);
+        super(configObj.getClass().getSimpleName().toLowerCase()+"_config", permission);
 
         var fields = Stream.of(configObj.getClass().getDeclaredFields())
                 .collect(Collectors.toMap(Field::getName, Function.identity()));

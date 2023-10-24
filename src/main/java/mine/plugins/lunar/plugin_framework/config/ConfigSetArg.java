@@ -2,6 +2,7 @@ package mine.plugins.lunar.plugin_framework.config;
 
 import mine.plugins.lunar.plugin_framework.cmds.args.Arg;
 import org.bukkit.command.CommandSender;
+import org.joml.Vector3i;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -48,6 +49,14 @@ public class ConfigSetArg extends Arg {
             case "class [Ljava.lang.Integer;":
                 try {
                     yield Arrays.stream(args.getLast().split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                } catch (NumberFormatException ignored) {
+                    yield null;
+                }
+
+            case "class org.joml.Vector3i":
+                try {
+                    var intArray = Arrays.stream(args.getLast().split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    yield new Vector3i(intArray[0], intArray[1], intArray[2]);
                 } catch (NumberFormatException ignored) {
                     yield null;
                 }

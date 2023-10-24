@@ -40,7 +40,9 @@ public abstract class BarrierProtectionListener implements Listener {
 
     protected abstract boolean isEntityInteractionAllowed(Entity entity, Location location,
                                                           BarrierProtection barrierProtection);
-    protected abstract boolean isEntitySpawnAllowed(Entity entity);
+
+    protected abstract boolean isEntitySpawnAllowed(Entity entity,
+                                                    @NonNull CreatureSpawnEvent.SpawnReason spawnReason);
 
     protected abstract boolean areLocationsBetweenBorder(Location location, @Nullable Location otherlocation);
     protected abstract boolean areBlocksBetweenBorder(List<BlockState> blocks, Location sourceLocation);
@@ -310,7 +312,7 @@ public abstract class BarrierProtectionListener implements Listener {
     //region ENTITY_SPAWN
     @EventHandler(ignoreCancelled = true)
     public void onLingeringSplash(LingeringPotionSplashEvent e) {
-        e.setCancelled(!isEntitySpawnAllowed(e.getAreaEffectCloud()));
+        e.setCancelled(!isEntitySpawnAllowed(e.getAreaEffectCloud(), CreatureSpawnEvent.SpawnReason.DEFAULT));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -325,23 +327,31 @@ public abstract class BarrierProtectionListener implements Listener {
         var isPlayerPlacementAllowed = player == null ||
                 isPlayerInteractionAllowed(player, e.getBlock().getLocation(), BarrierProtection.ENTITY_SPAWN);
 
-        e.setCancelled(!isEntitySpawnAllowed(e.getEntity()) || !isPlayerPlacementAllowed);
+        e.setCancelled(!isEntitySpawnAllowed(e.getEntity(), CreatureSpawnEvent.SpawnReason.DEFAULT) ||
+                !isPlayerPlacementAllowed);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityTransform(EntityTransformEvent e) {
-        var allowedEntities = e.getTransformedEntities().stream().filter(this::isEntitySpawnAllowed).toList();
-        e.setCancelled(allowedEntities.isEmpty());
+        var disallowedEntities = e.getTransformedEntities().stream()
+                .filter(entity -> !isEntitySpawnAllowed(entity, CreatureSpawnEvent.SpawnReason.DEFAULT)).toList();
+
+        e.setCancelled(!disallowedEntities.isEmpty());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onCreatureSpawn(CreatureSpawnEvent e) {
+        e.setCancelled(!isEntitySpawnAllowed(e.getEntity(), e.getSpawnReason()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e) {
-        e.setCancelled(!isEntitySpawnAllowed(e.getEntity()));
+        e.setCancelled(!isEntitySpawnAllowed(e.getEntity(), CreatureSpawnEvent.SpawnReason.DEFAULT));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleSpawn(VehicleCreateEvent e) {
-        e.setCancelled(!isEntitySpawnAllowed(e.getVehicle()));
+        e.setCancelled(!isEntitySpawnAllowed(e.getVehicle(), CreatureSpawnEvent.SpawnReason.DEFAULT));
     }
     //endregion
 

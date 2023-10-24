@@ -18,14 +18,26 @@ public class Clock {
     }
 
     public Duration getTimeElapsed() {
-        return Duration.between(start, Instant.now());
+        return getTimeElapsed(start);
+    }
+
+    public boolean didDurationElapsed() {
+        return didDurationElapsed(start, cycleDuration);
     }
 
     public void attemptRun(Runnable runnable) {
-        if (getTimeElapsed().compareTo(cycleDuration) < 0) return;
+        if (!didDurationElapsed()) return;
 
         runnable.run();
         resetTimer();
     }
 
+
+    public static Duration getTimeElapsed(Instant timestamp) {
+        return Duration.between(timestamp, Instant.now());
+    }
+
+    public static boolean didDurationElapsed(Instant timestamp, Duration duration) {
+        return getTimeElapsed(timestamp).compareTo(duration) > 0;
+    }
 }
